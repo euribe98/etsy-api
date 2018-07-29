@@ -1,0 +1,68 @@
+<!-- Use Etsy API to get shop sections in table form  -->
+
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
+<style>
+	table, th , td  {
+	  border: 1px solid grey;
+	  border-collapse: collapse;
+	  padding: 5px;
+	}
+	table tr:nth-child(odd) {
+	  background-color: #f1f1f1;
+	}
+	table tr:nth-child(even) {
+	  background-color: #ffffff;
+	}
+</style>
+
+<body>
+
+<div ng-app="myApp" ng-controller="myCtrl"> 
+	<h1>Shop Sections:</h1>
+	<p>Data : {{content}}</p>
+	<p>Status : {{statuscode}}</p>
+	<p>StatusText : {{statustext}}</p>
+	
+	<h2>Sections</h2>
+	<p>count: {{count}}</p>
+	
+	<table>
+	  <tr>
+	  	<td>Id</td>
+	  	<td>Title</td>
+	  </tr>
+	  <tr ng-repeat="x in myData | orderBy : 'title'">
+	    <td>{{ x.shop_section_id }}</td>
+	    <td>{{ x.title }}</td>
+	  </tr>
+	</table>
+</div>
+
+
+
+<script>
+var myurl = "https://openapi.etsy.com/v2/shops/bellasjardin/sections?fields=shop_section_id,title&limit=10&api_key=your-api-key";
+var app = angular.module('myApp', []);
+  //app.controller('myCtrl', function($scope, $http) {
+  //  $http.get(myurl).then(function(response) {
+app.controller('myCtrl', function($scope, $http) {
+  $http({
+    method : "GET",
+    url : myurl
+  }).then(function(response) {
+      $scope.content = response.data;
+      $scope.statuscode = response.status;
+      $scope.statustext = response.statusText; 
+      $scope.count = response.data.count;
+      $scope.myData = response.data.results;
+  },function(response) {
+      //Second function handles error
+      $scope.content = "Something went wrong";
+  });
+});
+</script>
+
+</body>
+</html>

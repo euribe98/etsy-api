@@ -1,0 +1,48 @@
+<!-- Use Etsy API to get shop sections in a drop down. The api is called from php  -->
+
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
+
+<body ng-app="myApp" ng-controller="myCtrl">
+
+<div > 
+	<h1>Shop Sections:</h1>
+	<p>Status : {{statuscode}}</p>
+	<p>StatusText : {{statustext}}</p>
+	
+	<h2>Sections</h2>
+	<p>number of sections: {{count}}</p>
+	
+	<select ng-model="selectedSection" ng-options="x.title for x in myData | orderBy : 'title'">
+	</select>
+	
+	<p>Selected Id: {{selectedSection.shop_section_id}}</p>
+	<p>Selected title: {{selectedSection.title}}</p>
+	
+</div>
+
+
+<script>
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope, $http) {
+  $http({
+    method : "GET",
+	params: {"functionname": "getshopsections", "shopname": "bellasjardin", "params": "shop_section_id,title", "limit": 10}, 
+	url : "etsyapi.php"
+    
+  }).then(function(response) {
+      $scope.content = response.data;
+      $scope.statuscode = response.status;
+      $scope.statustext = response.statusText; 
+      $scope.count = response.data.count;
+      $scope.myData = response.data.results;
+  },function(response) {
+      //Second function handles error
+      $scope.content = "Something went wrong";
+  });
+});
+</script>
+
+</body>
+</html>
