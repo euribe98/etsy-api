@@ -2,7 +2,7 @@
 
 ## Synopsis
 A simple javascript using jquery and the Etsy api to create a gallery of your Etsy listings from your shop.
-An Etsy api key is needed to use the Etsy api and is tracked by application. Etsy uses it in order to track overal api usage. For write access and access of private user data, an OAuth access token is also required, however this script only accesses a shop owner's public listings, which is not private data and hence no OAuth is neccessary.
+An Etsy api key is needed to use the Etsy api and is tracked by application. Etsy uses it in order to track overall api usage. For write access and access of private user data, an OAuth access token is also required, however this script only accesses a shop owner's public listings, which is not private data and hence no OAuth is neccessary.
 
 ## Code Example
 see: etsyapi.html
