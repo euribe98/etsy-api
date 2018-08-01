@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+ 
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script> 
+
+<style>
+	.row { 
+  		//display: table-row; 
+  		padding: 10px;
+		float:left; 
+		margin-right:5px;
+	}
+	[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+ 		 display: none !important;
+	}
+</style>
+</head>
+
+<body ng-app="myApp">
+
+<div ng-controller="featuredCtrl"> 	
+    <h1  ng-show="ready">Featured Listings</h1>
+    
+	<div class="table">
+  		<div class="row" div ng-repeat="l in listings">
+  		    <a ng-href="{{l.url}}">
+ 				<img ng-src="{{l.image_url}}">
+			</a>
+    		<div class="cell" ng-show="ready" >{{l.desc | shorten}}</div>
+    		<div class="cell" ng-show="ready" >{{l.cost}}</div>
+    		
+  		</div>
+  	</div>
+</div>
+
+
+<script>
+var app = angular.module('myApp', []);
+
+//filter to shorten 
+app.filter('shorten', function () {
+  return function(value) {
+      if(!angular.isString(value)) {
+          return value;
+      }  
+      return value.substring(0, 10) + "...";
+  };
+});
+
+
+//featured listings controller
+app.controller('featuredCtrl', function($scope, $http) {	
+	$scope.apiKey = 'your-api-key';
+	getFeaturedListings($scope, $http);
+});
+
+	
+//api featured listings	
+function getFeaturedListings($scope, $http) {
+	
+	$scope.ready = false;
+	apiKey = $scope.apiKey;
+		
+	$http({
+	  method : "GET",
+	  url :'https://openapi.etsy.com/v2/shops/bellasjardin/listings/featured?api_key='+apiKey
+	}).then(function(response) {
+		$scope.content = response.data;
+	  
+	    // for each listing, add new fields to the listing
+	    $scope.listings = []; 
+	 	angular.forEach( response.data.results, function(listing, index) {
+	 		
+	 		$http({
+	    		method : "GET",
+	    		url : 'https://openapi.etsy.com/v2/listings/'+ listing.listing_id + '/images?api_key='+ apiKey
+	  		  }).then(function(response) {
+	  			listing.image_id = response.data.results[0].listing_image_id;
+	  			listing.image_url = response.data.results[0].url_75x75;
+	  			
+	  			//work around to prevent title and price from loading until after images retrieved
+	  			//ng-show and ng-cloak didn't help
+	  			listing.desc = listing.title;
+	  			listing.cost = '$' + listing.price;
+	  		});
+	 		
+	 		$scope.listings.push(listing);
+		}); 
+	 	
+		//alert($scope.listings.length);
+		$scope.ready = true;
+		
+	},function(response) {
+	    //Second function handles error
+	    $scope.content = "Something went wrong";
+	});
+	
+}
+
+
+</script>
+
+
+</body>
+</html>
